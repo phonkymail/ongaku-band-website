@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ongaku.band — music collective</title>
+<meta name="description" content="ongaku.band — a music collective. The 5to8s, ThrKngs, Marathon Monks.">
+<link rel="icon" href="assets/logo-modern/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Courier+Prime:wght@400;700&family=Chewy&family=Fredoka:wght@400;500&family=Tilt+Neon&family=Orbitron:wght@700;900&family=Chakra+Petch:wght@400;500&family=Nunito+Sans:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="stage">
+  <div class="flow-wrap">
+    <div class="flow" id="flow" tabindex="0" aria-label="Tracks — scroll or use arrow keys to browse"></div>
+    <button class="mute" id="mute" type="button" aria-label="Mute" aria-pressed="false">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/>
+        <path class="mute-on" d="M15.5 9.2a4 4 0 0 1 0 5.6M18 6.8a7.5 7.5 0 0 1 0 10.4"/>
+        <path class="mute-off" d="M15.5 9.5l5 5M20.5 9.5l-5 5"/>
+      </svg>
+    </button>
+  </div>
+  <div class="info" id="info" aria-live="polite">
+    <h2 class="info-name" id="info-name">&nbsp;</h2>
+    <p class="info-about" id="info-about"></p>
+    <a class="info-link" id="info-link" href="#"></a>
+  </div>
+</main>
+
+<a class="logo" href="/" aria-label="ongaku.band — music collective">
+  <img src="assets/logo-modern/logo.png" alt="" width="1024" height="1024">
+</a>
+
+<footer class="copyright">ongaku<span>.band</span>&nbsp;&copy; 2026</footer>
+
+<script src="tracks.js"></script>
+<script src="player.js"></script>
+</body>
+</html>

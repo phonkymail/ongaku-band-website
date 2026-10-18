@@ -1,0 +1,337 @@
+/* palette sampled from the ongaku.band "Stripes" logo */
+:root {
+  --paper: #e8dcc3;
+  --ink: #2b2521;
+  --stage-bg: #000;
+  --red: #a8432f;
+  --mustard: #c9973e;
+  --teal: #3f6159;
+  --paper-60: rgba(232, 220, 195, .6);
+
+  --display: "Shrikhand", "Cooper Black", Georgia, serif;
+  --mono: "Courier Prime", "Courier New", ui-monospace, monospace;
+
+  --size: min(34dvh, 60vw, 420px);
+  --floor: #0b0b0b; /* page background where the cover area ends (fades blend into it) */
+  --frame: calc(var(--size) * .08); /* frame thickness around the artwork */
+}
+
+* { box-sizing: border-box; }
+
+/* one screen, no scrolling */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+
+body {
+  margin: 0;
+  height: 100dvh;
+  color: var(--paper);
+  font-family: var(--mono);
+  /* near-black, lifting very slightly towards the bottom like a glossy floor */
+  background: linear-gradient(#000 0%, #000 45%, #0c0c0c 100%), var(--stage-bg);
+}
+
+/* film grain */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: .05; /* no blend mode: it forced the whole page to re-blend every frame on phones */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9  0 0 0 0 .85  0 0 0 0 .75  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+img { max-width: 100%; display: block; }
+
+/* ---------- stage ---------- */
+.stage {
+  position: relative;
+  height: 100%;
+  padding: 0 16px;
+}
+
+/* ---------- vertical cover flow ---------- */
+.flow {
+  position: relative;
+  height: 100%;
+  perspective: 1200px;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden; /* keep reflections inside the cover area */
+}
+/* fade covers out towards the top and bottom edges. Painted gradients on top
+   rather than a mask-image, which re-rasterises the whole flow every frame. */
+.flow::before,
+.flow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 18%;
+  z-index: 200;
+  pointer-events: none;
+}
+.flow::before { top: 0; background: linear-gradient(#000, rgba(0, 0, 0, 0)); }
+.flow::after { bottom: 0; background: linear-gradient(transparent, var(--floor)); }
+.flow:focus-visible .is-current { outline: 2px solid var(--mustard); outline-offset: 6px; }
+
+.flow-item {
+  all: unset;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  aspect-ratio: 1;
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  background: var(--cover-bg, #000);
+  border-radius: 6px;
+  box-sizing: border-box; /* all: unset drops the global border-box */
+  padding: var(--frame);
+  cursor: pointer;
+  /* position, tilt, brightness and fade are animated per frame in player.js */
+  will-change: transform, opacity;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 24px 40px -18px #000;
+}
+/* mirror reflection: a flipped copy drawn behind every cover (see player.js) */
+.flow-reflection {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  aspect-ratio: 1;
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  background: var(--cover-bg, #000);
+  border-radius: 6px;
+  padding: var(--frame);
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, opacity;
+  -webkit-mask-image: linear-gradient(transparent 50%, rgba(0, 0, 0, .42));
+          mask-image: linear-gradient(transparent 50%, rgba(0, 0, 0, .42));
+}
+.flow-reflection img { width: 100%; height: 100%; border-radius: 2px; }
+/* darkens covers away from the centre (opacity set in player.js) */
+.shade {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* glass: bright rim + soft sheen across the top of the cover */
+.flow-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .06) 28%, transparent 46%),
+    linear-gradient(to top, rgba(255, 255, 255, .05), transparent 30%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .45),
+    inset 0 0 0 1px rgba(255, 255, 255, .16);
+}
+/* wide photos sitting in a square cover: blend the top/bottom edges away */
+.fade-edges {
+  -webkit-mask-image: linear-gradient(transparent 12%, #000 24%, #000 76%, transparent 88%);
+          mask-image: linear-gradient(transparent 12%, #000 24%, #000 76%, transparent 88%);
+}
+.flow-item img {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.flow-item.is-current {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .22), 0 30px 60px -20px #000;
+}
+
+/* ---------- band description, right of the centre cover ---------- */
+.info {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + var(--size) / 2 + clamp(32px, 5vw, 72px));
+  width: min(320px, calc(50% - var(--size) / 2 - 80px));
+  transform: translateY(-50%);
+  transition: opacity .25s, transform .25s;
+}
+.info.is-changing { opacity: 0; transform: translateY(calc(-50% + 8px)); }
+
+.info-name {
+  margin: 0;
+  font: 400 clamp(1.5rem, 2.6vw, 2.1rem)/1.1 var(--display);
+  color: var(--paper);
+}
+.info-badge {
+  display: inline-block;
+  height: 1.5em;
+  width: auto;
+  margin-left: .3em;
+  vertical-align: middle;
+  transform: rotate(6deg);
+}
+
+/* each band's name in its own type, matched to its artwork */
+.info[data-band="the5to8s"] .info-name {
+  font: 400 clamp(2rem, 3.6vw, 2.9rem)/1 "Chewy", var(--display);
+  color: #e0902f;
+  letter-spacing: .01em;
+  transform: rotate(-3deg);
+  transform-origin: left center;
+}
+.info[data-band="the5to8s"] .info-about {
+  font: 400 1.02rem/1.55 "Fredoka", var(--mono);
+  color: rgba(245, 225, 200, .78);
+}
+.info[data-band="thrkngs"] .info-name {
+  font: 400 clamp(1.9rem, 3.4vw, 2.7rem)/1.05 "Tilt Neon", var(--mono);
+  color: #ffd9cf;
+  letter-spacing: .04em;
+  text-shadow:
+    0 0 4px #ff5a3c,
+    0 0 12px #ff3b1f,
+    0 0 28px rgba(255, 40, 10, .7);
+}
+.info[data-band="thrkngs"] .info-about {
+  font: 400 1.05rem/1.6 "Tilt Neon", var(--mono);
+  color: rgba(255, 220, 210, .85);
+  letter-spacing: .02em;
+  text-shadow: 0 0 6px rgba(255, 60, 30, .55);
+}
+.info[data-band="marathonmonks"] .info-name {
+  font: 900 clamp(1.25rem, 2.2vw, 1.7rem)/1.15 "Orbitron", var(--mono);
+  color: #f2f2f2;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.info[data-band="marathonmonks"] .info-about {
+  font: 400 1.02rem/1.6 "Chakra Petch", var(--mono);
+  color: rgba(242, 242, 242, .78);
+  letter-spacing: .02em;
+}
+.info[data-band="marathonmonks"] .info-link {
+  font: 700 .8rem/1.4 "Orbitron", var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.info[data-band="thrkngs"] .info-link {
+  text-shadow:
+    0 0 4px #ff5a3c,
+    0 0 10px #ff3b1f,
+    0 0 20px rgba(255, 40, 10, .6);
+}
+
+.info-about {
+  margin: 14px 0 0;
+  font-size: .9rem;
+  line-height: 1.6;
+  color: var(--paper-60);
+}
+.info-link {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--accent, var(--mustard));
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color .2s;
+}
+.info-link::after { content: " →"; }
+.info-link:hover,
+.info-link:focus-visible { border-color: currentColor; outline: none; }
+
+/* ---------- tiny logo, bottom right ---------- */
+.logo {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--paper);
+  text-decoration: none;
+  opacity: .9;
+  transition: opacity .2s;
+}
+.logo:hover { opacity: 1; }
+.logo img {
+  width: 64px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px -8px #000;
+}
+
+/* ---------- copyright, bottom left, centred on the logo's height ---------- */
+.copyright {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 500;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  /* same type as the logo: Avenir Next on Apple devices, Nunito Sans elsewhere */
+  font: 600 .8rem/1 "Avenir Next", Avenir, "Nunito Sans", sans-serif;
+  letter-spacing: .02em;
+  color: var(--paper-60);
+}
+.copyright span { color: var(--red); }
+
+/* ---------- mute toggle, just outside the centre cover's top-left corner ---------- */
+.flow-wrap { position: relative; height: 100%; }
+.mute {
+  all: unset;
+  position: absolute;
+  top: calc(50% - var(--size) / 2);
+  left: calc(50% - var(--size) / 2 - 48px);
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--paper-60);
+  opacity: .6;
+  cursor: pointer;
+  transition: opacity .2s, color .2s;
+}
+.mute:hover { opacity: 1; color: var(--paper); }
+.mute:focus-visible { opacity: 1; outline: 2px solid var(--mustard); outline-offset: 2px; }
+.mute .mute-off,
+.mute[aria-pressed="true"] .mute-on { display: none; }
+.mute[aria-pressed="true"] .mute-off { display: inline; }
+
+/* ---------- phones ---------- */
+/* narrow screens: covers on top, description underneath */
+@media (max-width: 900px) {
+  .stage {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+  .flow-wrap { min-height: 0; }
+  .stage { --floor: #060606; } /* cover area ends higher up the page gradient */
+  .info {
+    position: static;
+    width: min(420px, 100%);
+    margin: 0 auto;
+    text-align: center;
+    transform: none;
+  }
+  .info.is-changing { transform: translateY(8px); }
+  .info[data-band="the5to8s"] .info-name { transform-origin: center; }
+  .logo img { width: 48px; }
+  .copyright { height: 48px; font-size: .75rem; }
+  .info-about { margin-top: 8px; font-size: .85rem; }
+  .info-link { margin-top: 10px; }
+}
+

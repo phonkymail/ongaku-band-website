@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <rect width="1024" height="1024" fill="#ece3d0"/>
+  <!-- three flat arcs + record, one shared baseline -->
+  <g fill="none" stroke-width="34" stroke-linecap="butt">
+    <path d="M232 560 A280 280 0 0 1 792 560" stroke="#a8432f"/>
+    <path d="M296 560 A216 216 0 0 1 728 560" stroke="#c9973e"/>
+    <path d="M360 560 A152 152 0 0 1 664 560" stroke="#3f6159"/>
+  </g>
+  <path d="M432 560 A80 80 0 0 1 592 560 Z" fill="#2b2521"/>
+  <circle cx="512" cy="560" r="9" fill="#ece3d0"/>
+  <rect x="216" y="560" width="592" height="6" fill="#2b2521"/>
+  <g font-family="Avenir Next, Avenir, Helvetica Neue, sans-serif" text-anchor="middle">
+    <text x="512" y="706" font-size="92" font-weight="600" letter-spacing="-2" fill="#2b2521">ongaku<tspan fill="#a8432f">.band</tspan></text>
+    <text x="512" y="766" font-size="24" font-weight="500" letter-spacing="10" fill="#2b2521" fill-opacity=".7">MUSIC COLLECTIVE</text>
+    <text x="512" y="872" font-size="18" font-weight="500" letter-spacing="3" fill="#2b2521" fill-opacity=".45">© 2026</text>
+  </g>
+</svg>
